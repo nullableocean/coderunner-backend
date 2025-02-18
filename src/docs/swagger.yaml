@@ -1,0 +1,104 @@
+basePath: /
+definitions:
+  api.CreateResponse:
+    properties:
+      task_id:
+        type: string
+    type: object
+  api.ResultResponse:
+    properties:
+      result:
+        type: string
+    type: object
+  api.StatusReponse:
+    properties:
+      status:
+        type: string
+    type: object
+  service.TaskCreateData:
+    properties:
+      code:
+        type: string
+      compiler_name:
+        type: string
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact: {}
+  description: This is a compile and execute system.
+  title: CompileSys
+  version: "1.0"
+paths:
+  /result/{task_id}:
+    get:
+      description: '"Get task execute result"'
+      parameters:
+      - description: task uuid
+        in: path
+        name: task_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.ResultResponse'
+        default:
+          description: error message
+          schema:
+            type: string
+      summary: Get result
+      tags:
+      - Tasks
+  /status/{task_id}:
+    get:
+      description: '"Get task proccess status"'
+      parameters:
+      - description: task uuid
+        in: path
+        name: task_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.StatusReponse'
+        default:
+          description: error message
+          schema:
+            type: string
+      summary: Get status
+      tags:
+      - Tasks
+  /task:
+    post:
+      consumes:
+      - application/json
+      description: '"Create task for compile and execute. Need code and compiler name."'
+      parameters:
+      - description: data for execute
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/service.TaskCreateData'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: task uuid
+          schema:
+            $ref: '#/definitions/api.CreateResponse'
+        default:
+          description: error message
+          schema:
+            type: string
+      summary: Create task
+      tags:
+      - Tasks
+swagger: "2.0"
