@@ -1,4 +1,4 @@
-package models
+package domain
 
 type TaskStatus int
 
@@ -18,7 +18,7 @@ func (ts TaskStatus) String() string {
 	return ""
 }
 
-type CompileTask struct {
+type Task struct {
 	Uuid         string
 	Code         string
 	CompilerName string

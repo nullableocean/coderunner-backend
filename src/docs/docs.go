@@ -38,13 +38,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/compilehandler.ResultResponse"
+                            "$ref": "#/definitions/types.ResultResponse"
                         }
                     },
                     "default": {
                         "description": "error response",
                         "schema": {
-                            "$ref": "#/definitions/rest.ErrorResponse"
+                            "$ref": "#/definitions/types.ErrorResponse"
                         }
                     }
                 }
@@ -52,14 +52,14 @@ const docTemplate = `{
         },
         "/status/{task_id}": {
             "get": {
-                "description": "\"Get task proccess status\"",
+                "description": "\"Get task process GetStatus\"",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Tasks"
                 ],
-                "summary": "Get status",
+                "summary": "Get GetStatus",
                 "parameters": [
                     {
                         "type": "string",
@@ -73,13 +73,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/compilehandler.StatusResponse"
+                            "$ref": "#/definitions/types.StatusResponse"
                         }
                     },
                     "default": {
                         "description": "error response",
                         "schema": {
-                            "$ref": "#/definitions/rest.ErrorResponse"
+                            "$ref": "#/definitions/types.ErrorResponse"
                         }
                     }
                 }
@@ -97,7 +97,7 @@ const docTemplate = `{
                 "tags": [
                     "Tasks"
                 ],
-                "summary": "Create task",
+                "summary": "Create task and process",
                 "parameters": [
                     {
                         "description": "data for execute",
@@ -105,7 +105,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/compilehandler.CreateTaskRequestBody"
+                            "$ref": "#/definitions/types.PostTaskRequestBody"
                         }
                     }
                 ],
@@ -113,13 +113,13 @@ const docTemplate = `{
                     "201": {
                         "description": "task uuid",
                         "schema": {
-                            "$ref": "#/definitions/compilehandler.CreateTaskResponse"
+                            "$ref": "#/definitions/types.PostTaskResponse"
                         }
                     },
                     "default": {
                         "description": "error response",
                         "schema": {
-                            "$ref": "#/definitions/rest.ErrorResponse"
+                            "$ref": "#/definitions/types.ErrorResponse"
                         }
                     }
                 }
@@ -127,7 +127,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "compilehandler.CreateTaskRequestBody": {
+        "types.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.PostTaskRequestBody": {
             "type": "object",
             "properties": {
                 "code": {
@@ -138,7 +146,7 @@ const docTemplate = `{
                 }
             }
         },
-        "compilehandler.CreateTaskResponse": {
+        "types.PostTaskResponse": {
             "type": "object",
             "properties": {
                 "task_id": {
@@ -146,7 +154,7 @@ const docTemplate = `{
                 }
             }
         },
-        "compilehandler.ResultResponse": {
+        "types.ResultResponse": {
             "type": "object",
             "properties": {
                 "result": {
@@ -154,18 +162,10 @@ const docTemplate = `{
                 }
             }
         },
-        "compilehandler.StatusResponse": {
+        "types.StatusResponse": {
             "type": "object",
             "properties": {
                 "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "rest.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
                     "type": "string"
                 }
             }

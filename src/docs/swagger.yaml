@@ -1,30 +1,30 @@
 basePath: /
 definitions:
-  compilehandler.CreateTaskRequestBody:
+  types.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  types.PostTaskRequestBody:
     properties:
       code:
         type: string
       compiler_name:
         type: string
     type: object
-  compilehandler.CreateTaskResponse:
+  types.PostTaskResponse:
     properties:
       task_id:
         type: string
     type: object
-  compilehandler.ResultResponse:
+  types.ResultResponse:
     properties:
       result:
         type: string
     type: object
-  compilehandler.StatusResponse:
+  types.StatusResponse:
     properties:
       status:
-        type: string
-    type: object
-  rest.ErrorResponse:
-    properties:
-      error:
         type: string
     type: object
 host: 127.0.0.1:8080
@@ -49,17 +49,17 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/compilehandler.ResultResponse'
+            $ref: '#/definitions/types.ResultResponse'
         default:
           description: error response
           schema:
-            $ref: '#/definitions/rest.ErrorResponse'
+            $ref: '#/definitions/types.ErrorResponse'
       summary: Get result
       tags:
       - Tasks
   /status/{task_id}:
     get:
-      description: '"Get task proccess status"'
+      description: '"Get task process GetStatus"'
       parameters:
       - description: task uuid
         in: path
@@ -72,12 +72,12 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/compilehandler.StatusResponse'
+            $ref: '#/definitions/types.StatusResponse'
         default:
           description: error response
           schema:
-            $ref: '#/definitions/rest.ErrorResponse'
-      summary: Get status
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Get GetStatus
       tags:
       - Tasks
   /task:
@@ -91,19 +91,19 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/compilehandler.CreateTaskRequestBody'
+          $ref: '#/definitions/types.PostTaskRequestBody'
       produces:
       - application/json
       responses:
         "201":
           description: task uuid
           schema:
-            $ref: '#/definitions/compilehandler.CreateTaskResponse'
+            $ref: '#/definitions/types.PostTaskResponse'
         default:
           description: error response
           schema:
-            $ref: '#/definitions/rest.ErrorResponse'
-      summary: Create task
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Create task and process
       tags:
       - Tasks
 swagger: "2.0"

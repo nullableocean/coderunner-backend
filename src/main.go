@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"nullableocean-postupashki/src/api/rest/compilehandler"
+	"nullableocean-postupashki/src/api/rest"
 	_ "nullableocean-postupashki/src/docs"
+	"nullableocean-postupashki/src/repository/ramstorage"
 	"nullableocean-postupashki/src/server"
-	"nullableocean-postupashki/src/service/compile"
-	"nullableocean-postupashki/src/storage/ramstorage"
+	"nullableocean-postupashki/src/usecases/service"
 
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -25,17 +25,18 @@ var (
 // @host 127.0.0.1:8080
 // @BasePath /
 func main() {
-	db := ramstorage.NewRamStorage()
-	cmplService := compile.NewCompileService(db)
-	cmplHandler := compilehandler.NewCompileHandler(cmplService)
+	db := ramstorage.NewTaskRepository()
+	cmplService := service.NewCompileTaskService(db)
+	cmplHandler := rest.NewTaskHandler(cmplService)
+
 	router := chi.NewRouter()
 	cmplHandler.RegisterRoutes(router)
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
+
 	server := server.NewServer(PORT, router)
 
 	fmt.Printf("Server listen on http://%s:%s\n...", HOST, PORT)
-
 	if err := server.Run(); err != nil {
 		log.Fatalln(err)
 	}
