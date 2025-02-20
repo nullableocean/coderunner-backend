@@ -26,11 +26,11 @@ var (
 // @BasePath /
 func main() {
 	db := ramstorage.NewTaskRepository()
-	cmplService := service.NewCompileTaskService(db)
-	cmplHandler := rest.NewTaskHandler(cmplService)
+	taskService := service.NewTaskService(db)
+	taskHandler := rest.NewTaskHandler(taskService)
 
 	router := chi.NewRouter()
-	cmplHandler.RegisterRoutes(router)
+	taskHandler.RegisterRoutes(router)
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 

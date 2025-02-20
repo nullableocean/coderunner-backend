@@ -3,35 +3,31 @@ package service
 import (
 	"nullableocean-postupashki/src/domain"
 	"nullableocean-postupashki/src/repository"
+	"nullableocean-postupashki/src/usecases"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-type CompileTaskService struct {
+type Task struct {
 	repo repository.TaskRepository
 }
 
-func NewCompileTaskService(repository repository.TaskRepository) *CompileTaskService {
-	return &CompileTaskService{
+func NewTaskService(repository repository.TaskRepository) usecases.TaskService {
+	return &Task{
 		repo: repository,
 	}
 }
 
-func (s *CompileTaskService) GetTask(id string) (*domain.Task, error) {
+func (s *Task) GetTask(id string) (*domain.Task, error) {
 	return s.repo.GetById(id)
 }
 
-func (s *CompileTaskService) CheckStatus(task *domain.Task) domain.TaskStatus {
+func (s *Task) CheckStatus(task *domain.Task) domain.TaskStatus {
 	return task.Status
 }
 
-type TaskCreateData struct {
-	Code         string
-	CompilerName string
-}
-
-func (s *CompileTaskService) CreateAndProcess(data *TaskCreateData) (*domain.Task, error) {
+func (s *Task) CreateAndProcess(data *usecases.TaskCreateData) (*domain.Task, error) {
 	task, err := s.create(data)
 	if err == nil {
 		s.process(task)
@@ -40,7 +36,7 @@ func (s *CompileTaskService) CreateAndProcess(data *TaskCreateData) (*domain.Tas
 	return task, err
 }
 
-func (s *CompileTaskService) create(data *TaskCreateData) (*domain.Task, error) {
+func (s *Task) create(data *usecases.TaskCreateData) (*domain.Task, error) {
 	task := &domain.Task{
 		Uuid:         uuid.NewString(),
 		Code:         data.Code,
@@ -52,7 +48,7 @@ func (s *CompileTaskService) create(data *TaskCreateData) (*domain.Task, error) 
 	return task, err
 }
 
-func (s *CompileTaskService) process(task *domain.Task) {
+func (s *Task) process(task *domain.Task) {
 	go func(task *domain.Task) {
 		time.Sleep(20 * time.Second)
 		task.Status = domain.Ready

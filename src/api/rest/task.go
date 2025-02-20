@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"nullableocean-postupashki/src/api/rest/types"
 	"nullableocean-postupashki/src/domain"
-	"nullableocean-postupashki/src/usecases/service"
+	"nullableocean-postupashki/src/usecases"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type TaskHandler struct {
-	taskService *service.CompileTaskService
+	taskService usecases.TaskService
 }
 
-func NewTaskHandler(s *service.CompileTaskService) *TaskHandler {
+func NewTaskHandler(s usecases.TaskService) *TaskHandler {
 	return &TaskHandler{
 		taskService: s,
 	}
@@ -36,7 +36,7 @@ func (h *TaskHandler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.taskService.CreateAndProcess(&service.TaskCreateData{
+	task, err := h.taskService.CreateAndProcess(&usecases.TaskCreateData{
 		Code:         taskPostBody.Code,
 		CompilerName: taskPostBody.CompilerName,
 	})
