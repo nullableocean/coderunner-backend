@@ -1,0 +1,109 @@
+basePath: /
+definitions:
+  types.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  types.PostTaskRequestBody:
+    properties:
+      code:
+        type: string
+      compiler_name:
+        type: string
+    type: object
+  types.PostTaskResponse:
+    properties:
+      task_id:
+        type: string
+    type: object
+  types.ResultResponse:
+    properties:
+      result:
+        type: string
+    type: object
+  types.StatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact: {}
+  description: This is a compile and execute system.
+  title: CompileSys
+  version: "1.0"
+paths:
+  /result/{task_id}:
+    get:
+      description: '"Get task execute result"'
+      parameters:
+      - description: task uuid
+        in: path
+        name: task_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.ResultResponse'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Get result
+      tags:
+      - Tasks
+  /status/{task_id}:
+    get:
+      description: '"Get task process GetStatus"'
+      parameters:
+      - description: task uuid
+        in: path
+        name: task_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.StatusResponse'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Get GetStatus
+      tags:
+      - Tasks
+  /task:
+    post:
+      consumes:
+      - application/json
+      description: '"Create task for compile and execute. Need code and compiler name."'
+      parameters:
+      - description: data for execute
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.PostTaskRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: task uuid
+          schema:
+            $ref: '#/definitions/types.PostTaskResponse'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Create task and process
+      tags:
+      - Tasks
+swagger: "2.0"
