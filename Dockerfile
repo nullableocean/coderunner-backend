@@ -1,17 +1,20 @@
-FROM golang:latest AS builder
-
-RUN go version
+FROM golang:1.24.0-alpine3.20 AS builder
 
 WORKDIR /build
+
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./src/main.go
+RUN apk add --no-cache make
 
-FROM alpine:latest
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./src/main.go
+
+FROM alpine:3.20
 
 WORKDIR /app/
 
-COPY --from=builder /build/app .
+COPY --from=builder /build/main .
 
-CMD ["./app"]
+CMD ["/app/main"]

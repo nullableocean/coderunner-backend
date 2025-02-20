@@ -1,24 +1,15 @@
-package storage
+package ramstorage
 
 import (
-	"errors"
 	"nullableocean-postupashki/src/models"
+	"nullableocean-postupashki/src/storage"
 )
-
-var (
-	ErrTaskNotFound = errors.New("task not found")
-)
-
-type Storage interface {
-	SaveTask(task *models.CompileTask) error
-	FindTask(id string) (*models.CompileTask, error)
-}
 
 type RamStorage struct {
 	tasksMap map[string]*models.CompileTask
 }
 
-func NewRamStorage() Storage {
+func NewRamStorage() storage.CompileStorage {
 	return &RamStorage{
 		tasksMap: map[string]*models.CompileTask{},
 	}
@@ -36,7 +27,7 @@ func (rs *RamStorage) SaveTask(task *models.CompileTask) error {
 func (rs *RamStorage) FindTask(id string) (*models.CompileTask, error) {
 	t, exist := rs.tasksMap[id]
 	if !exist {
-		return nil, ErrTaskNotFound
+		return nil, storage.ErrNotFound
 	}
 
 	return t, nil

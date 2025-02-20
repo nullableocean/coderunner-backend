@@ -1,25 +1,30 @@
 basePath: /
 definitions:
-  api.CreateResponse:
-    properties:
-      task_id:
-        type: string
-    type: object
-  api.ResultResponse:
-    properties:
-      result:
-        type: string
-    type: object
-  api.StatusReponse:
-    properties:
-      status:
-        type: string
-    type: object
-  service.TaskCreateData:
+  compilehandler.CreateTaskRequestBody:
     properties:
       code:
         type: string
       compiler_name:
+        type: string
+    type: object
+  compilehandler.CreateTaskResponse:
+    properties:
+      task_id:
+        type: string
+    type: object
+  compilehandler.ResultResponse:
+    properties:
+      result:
+        type: string
+    type: object
+  compilehandler.StatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  rest.ErrorResponse:
+    properties:
+      error:
         type: string
     type: object
 host: 127.0.0.1:8080
@@ -44,11 +49,11 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/api.ResultResponse'
+            $ref: '#/definitions/compilehandler.ResultResponse'
         default:
-          description: error message
+          description: error response
           schema:
-            type: string
+            $ref: '#/definitions/rest.ErrorResponse'
       summary: Get result
       tags:
       - Tasks
@@ -67,11 +72,11 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/api.StatusReponse'
+            $ref: '#/definitions/compilehandler.StatusResponse'
         default:
-          description: error message
+          description: error response
           schema:
-            type: string
+            $ref: '#/definitions/rest.ErrorResponse'
       summary: Get status
       tags:
       - Tasks
@@ -86,18 +91,18 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/service.TaskCreateData'
+          $ref: '#/definitions/compilehandler.CreateTaskRequestBody'
       produces:
       - application/json
       responses:
         "201":
           description: task uuid
           schema:
-            $ref: '#/definitions/api.CreateResponse'
+            $ref: '#/definitions/compilehandler.CreateTaskResponse'
         default:
-          description: error message
+          description: error response
           schema:
-            type: string
+            $ref: '#/definitions/rest.ErrorResponse'
       summary: Create task
       tags:
       - Tasks

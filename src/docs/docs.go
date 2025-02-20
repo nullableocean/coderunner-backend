@@ -38,13 +38,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/api.ResultResponse"
+                            "$ref": "#/definitions/compilehandler.ResultResponse"
                         }
                     },
                     "default": {
-                        "description": "error message",
+                        "description": "error response",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/rest.ErrorResponse"
                         }
                     }
                 }
@@ -73,13 +73,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/api.StatusReponse"
+                            "$ref": "#/definitions/compilehandler.StatusResponse"
                         }
                     },
                     "default": {
-                        "description": "error message",
+                        "description": "error response",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/rest.ErrorResponse"
                         }
                     }
                 }
@@ -105,7 +105,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.TaskCreateData"
+                            "$ref": "#/definitions/compilehandler.CreateTaskRequestBody"
                         }
                     }
                 ],
@@ -113,13 +113,13 @@ const docTemplate = `{
                     "201": {
                         "description": "task uuid",
                         "schema": {
-                            "$ref": "#/definitions/api.CreateResponse"
+                            "$ref": "#/definitions/compilehandler.CreateTaskResponse"
                         }
                     },
                     "default": {
-                        "description": "error message",
+                        "description": "error response",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/rest.ErrorResponse"
                         }
                     }
                 }
@@ -127,7 +127,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.CreateResponse": {
+        "compilehandler.CreateTaskRequestBody": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "compiler_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "compilehandler.CreateTaskResponse": {
             "type": "object",
             "properties": {
                 "task_id": {
@@ -135,7 +146,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.ResultResponse": {
+        "compilehandler.ResultResponse": {
             "type": "object",
             "properties": {
                 "result": {
@@ -143,7 +154,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.StatusReponse": {
+        "compilehandler.StatusResponse": {
             "type": "object",
             "properties": {
                 "status": {
@@ -151,13 +162,10 @@ const docTemplate = `{
                 }
             }
         },
-        "service.TaskCreateData": {
+        "rest.ErrorResponse": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "compiler_name": {
+                "error": {
                     "type": "string"
                 }
             }
