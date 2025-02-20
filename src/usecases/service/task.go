@@ -13,13 +13,13 @@ type Task struct {
 	repo repository.TaskRepository
 }
 
-func NewTaskService(repository repository.TaskRepository) usecases.TaskService {
+func NewTaskService(repository repository.TaskRepository) usecases.Task {
 	return &Task{
 		repo: repository,
 	}
 }
 
-func (s *Task) GetTask(id string) (*domain.Task, error) {
+func (s *Task) Get(id string) (*domain.Task, error) {
 	return s.repo.GetById(id)
 }
 
@@ -27,7 +27,7 @@ func (s *Task) CheckStatus(task *domain.Task) domain.TaskStatus {
 	return task.Status
 }
 
-func (s *Task) CreateAndProcess(data *usecases.TaskCreateData) (*domain.Task, error) {
+func (s *Task) CreateAndProcess(data *domain.Task) (*domain.Task, error) {
 	task, err := s.create(data)
 	if err == nil {
 		s.process(task)
@@ -36,13 +36,9 @@ func (s *Task) CreateAndProcess(data *usecases.TaskCreateData) (*domain.Task, er
 	return task, err
 }
 
-func (s *Task) create(data *usecases.TaskCreateData) (*domain.Task, error) {
-	task := &domain.Task{
-		Uuid:         uuid.NewString(),
-		Code:         data.Code,
-		CompilerName: data.CompilerName,
-		Status:       domain.InProgress,
-	}
+func (s *Task) create(task *domain.Task) (*domain.Task, error) {
+	task.Uuid = uuid.NewString()
+	task.Status = domain.InProgress
 
 	err := s.repo.Post(task)
 	return task, err

@@ -11,10 +11,10 @@ import (
 )
 
 type TaskHandler struct {
-	taskService usecases.TaskService
+	taskService usecases.Task
 }
 
-func NewTaskHandler(s usecases.TaskService) *TaskHandler {
+func NewTaskHandler(s usecases.Task) *TaskHandler {
 	return &TaskHandler{
 		taskService: s,
 	}
@@ -36,7 +36,7 @@ func (h *TaskHandler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.taskService.CreateAndProcess(&usecases.TaskCreateData{
+	task, err := h.taskService.CreateAndProcess(&domain.Task{
 		Code:         taskPostBody.Code,
 		CompilerName: taskPostBody.CompilerName,
 	})
@@ -99,7 +99,7 @@ func (h *TaskHandler) GetResult(w http.ResponseWriter, r *http.Request) {
 
 func (h *TaskHandler) getTaskFromRequest(r *http.Request) (*domain.Task, error) {
 	taskId := chi.URLParam(r, "task_id")
-	return h.taskService.GetTask(taskId)
+	return h.taskService.Get(taskId)
 }
 
 func (h *TaskHandler) RegisterRoutes(router *chi.Mux) {
