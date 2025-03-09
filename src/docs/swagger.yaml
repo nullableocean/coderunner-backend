@@ -1,8 +1,19 @@
-basePath: /
 definitions:
   types.ErrorResponse:
     properties:
       error:
+        type: string
+    type: object
+  types.LoginRequestBody:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  types.LoginResponse:
+    properties:
+      token:
         type: string
     type: object
   types.PostTaskRequestBody:
@@ -17,6 +28,13 @@ definitions:
       task_id:
         type: string
     type: object
+  types.RegisterRequestBody:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
   types.ResultResponse:
     properties:
       result:
@@ -27,7 +45,6 @@ definitions:
       status:
         type: string
     type: object
-host: 127.0.0.1:8080
 info:
   contact: {}
   description: This is a compile and execute system.
@@ -50,6 +67,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/types.ResultResponse'
+        "401":
+          description: Unauthorized
         default:
           description: error response
           schema:
@@ -73,6 +92,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/types.StatusResponse'
+        "401":
+          description: Unauthorized
         default:
           description: error response
           schema:
@@ -99,6 +120,8 @@ paths:
           description: task uuid
           schema:
             $ref: '#/definitions/types.PostTaskResponse'
+        "401":
+          description: Unauthorized
         default:
           description: error response
           schema:
@@ -106,4 +129,58 @@ paths:
       summary: Create task and process
       tags:
       - Tasks
+  /user/login:
+    post:
+      description: '"Login user"'
+      parameters:
+      - description: user login data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.LoginResponse'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Login Login
+      tags:
+      - User
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: '"Register user"'
+      parameters:
+      - description: user register data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.RegisterRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Register user
+      tags:
+      - User
+securityDefinitions:
+  APIKeyHeader:
+    description: 'Header expamle: "Authorization: Bearer {token}"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

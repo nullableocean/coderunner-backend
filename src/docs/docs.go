@@ -41,6 +41,9 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.ResultResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "default": {
                         "description": "error response",
                         "schema": {
@@ -75,6 +78,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/types.StatusResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "default": {
                         "description": "error response",
@@ -116,6 +122,83 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.PostTaskResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "\"Login user\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Login Login",
+                "parameters": [
+                    {
+                        "description": "user login data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.LoginRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/types.LoginResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/register": {
+            "post": {
+                "description": "\"Register user\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Register user",
+                "parameters": [
+                    {
+                        "description": "user register data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.RegisterRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
                     "default": {
                         "description": "error response",
                         "schema": {
@@ -131,6 +214,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LoginRequestBody": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }
@@ -154,6 +256,17 @@ const docTemplate = `{
                 }
             }
         },
+        "types.RegisterRequestBody": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "types.ResultResponse": {
             "type": "object",
             "properties": {
@@ -170,14 +283,22 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "description": "Header expamle: \"Authorization: Bearer {token}\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "127.0.0.1:8080",
-	BasePath:         "/",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "CompileSys",
 	Description:      "This is a compile and execute system.",
