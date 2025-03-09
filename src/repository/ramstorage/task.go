@@ -27,7 +27,7 @@ func (rs *TaskRepository) Post(task *domain.Task) error {
 func (rs *TaskRepository) GetById(id string) (*domain.Task, error) {
 	t, exist := rs.tasksMap[id]
 	if !exist {
-		return nil, repository.ErrNotFound
+		return nil, repository.ErrTaskNotFound
 	}
 
 	return t, nil

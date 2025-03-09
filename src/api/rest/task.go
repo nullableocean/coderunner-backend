@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"net/http"
+	"nullableocean-postupashki/src/api/rest/middleware"
 	"nullableocean-postupashki/src/api/rest/types"
 	"nullableocean-postupashki/src/domain"
 	"nullableocean-postupashki/src/usecases"
@@ -11,13 +12,25 @@ import (
 )
 
 type TaskHandler struct {
-	taskService usecases.Task
+	taskService    usecases.Task
+	sessionService usecases.Session
 }
 
-func NewTaskHandler(s usecases.Task) *TaskHandler {
+func NewTaskHandler(s usecases.Task, sessions usecases.Session) *TaskHandler {
 	return &TaskHandler{
-		taskService: s,
+		taskService:    s,
+		sessionService: sessions,
 	}
+}
+
+func (h *TaskHandler) RegisterRoutes(router *chi.Mux) {
+	router.Group(func(r chi.Router) {
+		r.Use(middleware.Auth(h.sessionService)) //secure
+
+		r.Post("/task", h.Post)
+		r.Get("/status/{task_id}", h.GetStatus)
+		r.Get("/result/{task_id}", h.GetResult)
+	})
 }
 
 // @Summary Create task and process
@@ -100,10 +113,4 @@ func (h *TaskHandler) GetResult(w http.ResponseWriter, r *http.Request) {
 func (h *TaskHandler) getTaskFromRequest(r *http.Request) (*domain.Task, error) {
 	taskId := chi.URLParam(r, "task_id")
 	return h.taskService.Get(taskId)
-}
-
-func (h *TaskHandler) RegisterRoutes(router *chi.Mux) {
-	router.Post("/task", h.Post)
-	router.Get("/status/{task_id}", h.GetStatus)
-	router.Get("/result/{task_id}", h.GetResult)
 }

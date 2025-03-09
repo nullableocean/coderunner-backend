@@ -5,6 +5,7 @@ import (
 	"log"
 	"nullableocean-postupashki/src/api/rest"
 	_ "nullableocean-postupashki/src/docs"
+	"nullableocean-postupashki/src/pkg/hasher"
 	"nullableocean-postupashki/src/repository/ramstorage"
 	"nullableocean-postupashki/src/server"
 	"nullableocean-postupashki/src/usecases/service"
@@ -25,12 +26,22 @@ var (
 // @host 127.0.0.1:8080
 // @BasePath /
 func main() {
-	db := ramstorage.NewTaskRepository()
-	taskService := service.NewTaskService(db)
-	taskHandler := rest.NewTaskHandler(taskService)
+	passHasher := &hasher.BcryptHasher{}
+
+	taskRepo := ramstorage.NewTaskRepository()
+	userRepo := ramstorage.NewUserRepository()
+	sessionRepo := ramstorage.NewSessionRepository()
+
+	sessionService := service.NewSessionService(sessionRepo)
+	userService := service.NewUserService(userRepo, sessionService, passHasher)
+	taskService := service.NewTaskService(taskRepo)
+
+	userHandler := rest.NewUserHandler(userService)
+	taskHandler := rest.NewTaskHandler(taskService, sessionService)
 
 	router := chi.NewRouter()
 	taskHandler.RegisterRoutes(router)
+	userHandler.RegisterRoutes(router)
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 

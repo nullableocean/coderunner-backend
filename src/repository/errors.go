@@ -3,5 +3,8 @@ package repository
 import "errors"
 
 var (
-	ErrNotFound = errors.New("task not found")
+	ErrTaskNotFound        = errors.New("task not found")
+	ErrUserNotFound        = errors.New("user not found")
+	ErrSessionNotFound     = errors.New("session not found")
+	ErrSessionAlreadyExist = errors.New("session already exist")
 )
