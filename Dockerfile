@@ -16,5 +16,6 @@ FROM alpine:3.20
 WORKDIR /app/
 
 COPY --from=builder /build/main .
+COPY .env .
 
 CMD ["/app/main"]

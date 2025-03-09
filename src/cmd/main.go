@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"nullableocean-postupashki/src/api/rest"
+	"nullableocean-postupashki/src/config"
 	_ "nullableocean-postupashki/src/docs"
 	"nullableocean-postupashki/src/pkg/hasher"
 	"nullableocean-postupashki/src/repository/ramstorage"
@@ -14,18 +15,13 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-var (
-	PORT = "8080"
-	HOST = "127.0.0.1"
-)
-
 // @title CompileSys
 // @version 1.0
 // @description This is a compile and execute system.
-
-// @host 127.0.0.1:8080
 // @BasePath /
 func main() {
+	cnf := config.ReadConfig()
+
 	passHasher := &hasher.BcryptHasher{}
 
 	taskRepo := ramstorage.NewTaskRepository()
@@ -45,9 +41,9 @@ func main() {
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	server := server.NewServer(PORT, router)
+	server := server.NewServer(cnf.Port, router)
 
-	fmt.Printf("Server listen on http://%s:%s\n...", HOST, PORT)
+	fmt.Printf("Server listen on http://%s:%s\n...", cnf.Host, cnf.Port)
 	if err := server.Run(); err != nil {
 		log.Fatalln(err)
 	}
