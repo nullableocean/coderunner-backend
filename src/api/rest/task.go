@@ -36,10 +36,12 @@ func (h *TaskHandler) RegisterRoutes(router *chi.Mux) {
 // @Summary Create task and process
 // @Description "Create task for compile and execute. Need code and compiler name."
 // @Tags Tasks
+// @Secure APIKeyHeader
 // @Accept json
 // @Produce json
 // @Param data body types.PostTaskRequestBody true "data for execute"
 // @Success 201 {object} types.PostTaskResponse "task uuid"
+// @Failure 401
 // @Failure default {object} types.ErrorResponse "error response"
 // @Router /task [post]
 func (h *TaskHandler) Post(w http.ResponseWriter, r *http.Request) {
@@ -65,10 +67,12 @@ func (h *TaskHandler) Post(w http.ResponseWriter, r *http.Request) {
 
 // @Summary Get GetStatus
 // @Description "Get task process GetStatus"
+// @Secure APIKeyHeader
 // @Tags Tasks
 // @Produce json
 // @Param task_id path string true "task uuid"
 // @Success 201 {object} types.StatusResponse
+// @Failure 401
 // @Failure default {object} types.ErrorResponse "error response"
 // @Router /status/{task_id} [get]
 func (h *TaskHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -86,10 +90,12 @@ func (h *TaskHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 
 // @Summary Get result
 // @Description "Get task execute result"
+// @Secure APIKeyHeader
 // @Tags Tasks
 // @Produce json
 // @Param task_id path string true "task uuid"
 // @Success 201 {object} types.ResultResponse
+// @Failure 401
 // @Failure default {object} types.ErrorResponse "error response"
 // @Router /result/{task_id} [get]
 func (h *TaskHandler) GetResult(w http.ResponseWriter, r *http.Request) {

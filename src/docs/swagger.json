@@ -6,8 +6,6 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "127.0.0.1:8080",
-    "basePath": "/",
     "paths": {
         "/result/{task_id}": {
             "get": {
@@ -34,6 +32,9 @@
                         "schema": {
                             "$ref": "#/definitions/types.ResultResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "default": {
                         "description": "error response",
@@ -69,6 +70,9 @@
                         "schema": {
                             "$ref": "#/definitions/types.StatusResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "default": {
                         "description": "error response",
@@ -109,6 +113,9 @@
                         "schema": {
                             "$ref": "#/definitions/types.PostTaskResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "default": {
                         "description": "error response",
@@ -267,6 +274,14 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "description": "Header expamle: \"Authorization: Bearer {token}\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

@@ -41,6 +41,9 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.ResultResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "default": {
                         "description": "error response",
                         "schema": {
@@ -75,6 +78,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/types.StatusResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "default": {
                         "description": "error response",
@@ -115,6 +121,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/types.PostTaskResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "default": {
                         "description": "error response",
@@ -274,14 +283,22 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "description": "Header expamle: \"Authorization: Bearer {token}\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "127.0.0.1:8080",
-	BasePath:         "/",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "CompileSys",
 	Description:      "This is a compile and execute system.",

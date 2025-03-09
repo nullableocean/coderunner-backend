@@ -18,6 +18,10 @@ import (
 // @title CompileSys
 // @version 1.0
 // @description This is a compile and execute system.
+// @securityDefinitions.apikey APIKeyHeader
+// @in header
+// @name Authorization
+// @description Header expamle: "Authorization: Bearer {token}"
 // @BasePath /
 func main() {
 	cnf := config.ReadConfig()
