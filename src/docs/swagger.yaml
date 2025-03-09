@@ -5,6 +5,18 @@ definitions:
       error:
         type: string
     type: object
+  types.LoginRequestBody:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  types.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
   types.PostTaskRequestBody:
     properties:
       code:
@@ -15,6 +27,13 @@ definitions:
   types.PostTaskResponse:
     properties:
       task_id:
+        type: string
+    type: object
+  types.RegisterRequestBody:
+    properties:
+      login:
+        type: string
+      password:
         type: string
     type: object
   types.ResultResponse:
@@ -106,4 +125,52 @@ paths:
       summary: Create task and process
       tags:
       - Tasks
+  /user/login:
+    post:
+      description: '"Login user"'
+      parameters:
+      - description: user login data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.LoginResponse'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Login Login
+      tags:
+      - User
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: '"Register user"'
+      parameters:
+      - description: user register data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/types.RegisterRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Register user
+      tags:
+      - User
 swagger: "2.0"
