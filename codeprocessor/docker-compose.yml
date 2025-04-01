@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  docdemon:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - docker-data:/var/lib/docker
+      - ./docker/certs:/certs
+    command: [
+      "dockerd",
+      "--host=tcp://0.0.0.0:2375",
+      "--host=unix:///var/run/docker.sock",
+      "--tlsverify",
+      "--tlscacert=/certs/ca.pem",
+      "--tlscert=/certs/server-cert.pem",
+      "--tlskey=/certs/server-key.pem"
+    ]
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dind-net
+        
+  code-processor:
+    build:
+      context: .
+      dockerfile: docker/main.Dockerfile
+    environment:
+      DOCKER_HOST: tcp://docdemon:2375
+      DOCKER_TLS_VERIFY: "1"
+      DOCKER_CERT_PATH: "/certs"
+    volumes:
+      - ./docker/certs:/certs:ro
+    depends_on:
+      docdemon: 
+        condition: service_healthy
+    networks:
+      - dind-net
+
+volumes:
+  docker-data:
+
+networks:
+  dind-net:
+    driver: bridge
