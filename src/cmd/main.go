@@ -7,6 +7,7 @@ import (
 	"nullableocean-postupashki/src/config"
 	_ "nullableocean-postupashki/src/docs"
 	"nullableocean-postupashki/src/pkg/hasher"
+	"nullableocean-postupashki/src/repository/rabbitmq"
 	"nullableocean-postupashki/src/repository/ramstorage"
 	"nullableocean-postupashki/src/server"
 	"nullableocean-postupashki/src/usecases/service"
@@ -24,7 +25,8 @@ import (
 // @description Header expamle: "Authorization: Bearer {token}"
 // @BasePath /
 func main() {
-	cnf := config.ReadConfig()
+	appFlags := config.ParseFlags()
+	cfg := config.NewAppConfig(appFlags.ConfigPath)
 
 	passHasher := &hasher.BcryptHasher{}
 
@@ -32,9 +34,14 @@ func main() {
 	userRepo := ramstorage.NewUserRepository()
 	sessionRepo := ramstorage.NewSessionRepository()
 
+	taskSender, err := rabbitmq.NewRabbitMQTaskSender(cfg.RabbitMQ.GetAmqpUrl(), cfg.RabbitMQ.QueueName)
+	if err != nil {
+		log.Fatalf("message broker error: %s", err)
+	}
+
 	sessionService := service.NewSessionService(sessionRepo)
 	userService := service.NewUserService(userRepo, sessionService, passHasher)
-	taskService := service.NewTaskService(taskRepo)
+	taskService := service.NewTaskService(taskRepo, taskSender)
 
 	userHandler := rest.NewUserHandler(userService)
 	taskHandler := rest.NewTaskHandler(taskService, sessionService)
@@ -45,9 +52,9 @@ func main() {
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	server := server.NewServer(cnf.Port, router)
+	server := server.NewServer(cfg.Server.Port, router)
 
-	fmt.Printf("Server listen on http://%s:%s\n...", cnf.Host, cnf.Port)
+	fmt.Printf("Server listen on http://%s:%s\n...", cfg.Server.Host, cfg.Server.Port)
 	if err := server.Run(); err != nil {
 		log.Fatalln(err)
 	}

@@ -1,0 +1,10 @@
+server:
+  host: 127.0.0.1
+  port: 8080
+
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  user: guest
+  password: guest
+  queue_name: tasks

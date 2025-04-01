@@ -9,42 +9,44 @@ import (
 	"github.com/google/uuid"
 )
 
-type Task struct {
-	repo repository.TaskRepository
+type TaskService struct {
+	taskRepo   repository.TaskRepository
+	taskSender repository.TaskSender
 }
 
-func NewTaskService(repository repository.TaskRepository) usecases.Task {
-	return &Task{
-		repo: repository,
+func NewTaskService(repository repository.TaskRepository, sender repository.TaskSender) usecases.Task {
+	return &TaskService{
+		taskRepo:   repository,
+		taskSender: sender,
 	}
 }
 
-func (s *Task) Get(id string) (*domain.Task, error) {
-	return s.repo.GetById(id)
+func (s *TaskService) Get(id string) (*domain.Task, error) {
+	return s.taskRepo.GetById(id)
 }
 
-func (s *Task) CheckStatus(task *domain.Task) domain.TaskStatus {
+func (s *TaskService) CheckStatus(task *domain.Task) domain.TaskStatus {
 	return task.Status
 }
 
-func (s *Task) CreateAndProcess(data *domain.Task) (*domain.Task, error) {
+func (s *TaskService) CreateAndProcess(data *domain.Task) (*domain.Task, error) {
 	task, err := s.create(data)
 	if err == nil {
-		s.process(task)
+		s.taskSender.Send(task)
 	}
 
 	return task, err
 }
 
-func (s *Task) create(task *domain.Task) (*domain.Task, error) {
+func (s *TaskService) create(task *domain.Task) (*domain.Task, error) {
 	task.Uuid = uuid.NewString()
 	task.Status = domain.InProgress
 
-	err := s.repo.Post(task)
+	err := s.taskRepo.Post(task)
 	return task, err
 }
 
-func (s *Task) process(task *domain.Task) {
+func (s *TaskService) process(task *domain.Task) {
 	go func(task *domain.Task) {
 		time.Sleep(20 * time.Second)
 		task.Status = domain.Ready

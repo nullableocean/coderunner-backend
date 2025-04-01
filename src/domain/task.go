@@ -19,8 +19,8 @@ func (ts TaskStatus) String() string {
 }
 
 type Task struct {
-	Uuid         string
-	Code         string
-	CompilerName string
-	Status       TaskStatus
+	Uuid         string     `json:"uuid"`
+	Code         string     `json:"code"`
+	CompilerName string     `json:"compiler"`
+	Status       TaskStatus `json:"-"`
 }

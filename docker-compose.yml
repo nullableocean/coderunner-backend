@@ -10,4 +10,23 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
     
   app:
-    build: .
+    context: .
+    dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+    restart: always
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 15s
+      timeout: 15s
+      retries: 10
