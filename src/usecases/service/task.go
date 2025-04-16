@@ -29,6 +29,11 @@ func (s *TaskService) CheckStatus(task *domain.Task) domain.TaskStatus {
 	return task.Status
 }
 
+func (s *TaskService) UpdateStatus(task *domain.Task, newStatus domain.TaskStatus) error {
+	task.Status = newStatus
+	return s.taskRepo.Update(task)
+}
+
 func (s *TaskService) CreateAndProcess(data *domain.Task) (*domain.Task, error) {
 	task, err := s.create(data)
 	if err == nil {

@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"log"
+	"os"
 	"runtime"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -24,9 +25,9 @@ type CommiterConfig struct {
 }
 
 type AppConfig struct {
-	RabbitMqConfig
-	ProcessorConfig
-	CommiterConfig
+	Rabbit   RabbitMqConfig
+	Process  ProcessorConfig
+	Commiter CommiterConfig
 }
 
 type AppFlags struct {
@@ -36,22 +37,33 @@ type AppFlags struct {
 func ParseFlags() *AppFlags {
 	runnerDocDir := flag.String("runnerdoc", "", "Path to config")
 
+	flag.Parse()
+
+	_, err := os.Stat(*runnerDocDir)
+	if err != nil {
+		log.Fatalln("error path for runner dockerfile directory")
+	}
+
 	return &AppFlags{
 		RunnerDockerfileDir: *runnerDocDir,
 	}
 }
 
-func InitConfig() AppConfig {
-	cfg := AppConfig{}
+func InitConfig() *AppConfig {
+	cfg := &AppConfig{}
 
 	err := cleanenv.ReadConfig(".env", cfg)
 	if err != nil {
 		log.Fatalf("read config error %s", err)
 	}
 
-	if cfg.ProcessesLimit == 0 {
-		cfg.ProcessesLimit = runtime.NumCPU()
-	}
+	checkProcessConfig(cfg)
 
 	return cfg
+}
+
+func checkProcessConfig(cfg *AppConfig) {
+	if cfg.Process.ProcessesLimit == 0 {
+		cfg.Process.ProcessesLimit = runtime.NumCPU()
+	}
 }

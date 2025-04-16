@@ -31,6 +31,7 @@ func main() {
 	passHasher := &hasher.BcryptHasher{}
 
 	taskRepo := ramstorage.NewTaskRepository()
+	resultRepo := ramstorage.NewResultRepository()
 	userRepo := ramstorage.NewUserRepository()
 	sessionRepo := ramstorage.NewSessionRepository()
 
@@ -42,13 +43,16 @@ func main() {
 	sessionService := service.NewSessionService(sessionRepo)
 	userService := service.NewUserService(userRepo, sessionService, passHasher)
 	taskService := service.NewTaskService(taskRepo, taskSender)
+	resultService := service.NewResultService(resultRepo)
 
 	userHandler := rest.NewUserHandler(userService)
-	taskHandler := rest.NewTaskHandler(taskService, sessionService)
+	taskHandler := rest.NewTaskHandler(taskService, resultService, sessionService)
+	commitHandler := rest.NewCommitHandler(cfg.Commiter.AccessHeader, cfg.Commiter.AccessToken, resultService)
 
 	router := chi.NewRouter()
 	taskHandler.RegisterRoutes(router)
 	userHandler.RegisterRoutes(router)
+	commitHandler.RegisterRoutes(router)
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 

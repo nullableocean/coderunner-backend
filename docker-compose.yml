@@ -5,16 +5,18 @@ services:
     depends_on:
       - app
     ports:
-      - "${PORT}:80"
+      - "${APP_PORT}:80"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
     
   app:
-    context: .
-    dockerfile: Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
+    restart: always
 
   rabbitmq:
     image: "rabbitmq:3-management"

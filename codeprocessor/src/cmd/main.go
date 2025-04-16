@@ -36,9 +36,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	commiter := httpcommiter.NewHttpCommiter(cfg.CommitUrl, cfg.CommiterConfig.AccessToken, cfg.CommiterConfig.AccessHeader)
+	commiter := httpcommiter.NewHttpCommiter(cfg.Commiter.CommitUrl, cfg.Commiter.AccessToken, cfg.Commiter.AccessHeader)
 	codeProcessor := processor.NewCodeProcessor(commiter, runner)
-	processPool := processpool.NewProcessPool(cfg.ProcessesLimit, codeProcessor, logger)
+	processPool := processpool.NewProcessPool(cfg.Process.ProcessesLimit, codeProcessor, logger)
 	taskConsumer := consumer.NewTaskConsumer(processPool, logger)
 
 	ctx := context.Background()
@@ -58,7 +58,7 @@ func main() {
 		wg.Done()
 	}()
 
-	err = taskConsumer.Consume(cfg.AmqpUrl, cfg.QueueName)
+	err = taskConsumer.Consume(cfg.Rabbit.AmqpUrl, cfg.Rabbit.QueueName)
 	if err != nil {
 		log.Fatal(err)
 	}

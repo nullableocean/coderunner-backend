@@ -12,6 +12,21 @@ var (
 	AuthorizationPrefix = "Bearer "
 )
 
+func CommiterAuth(accessHeader, accessToken string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			token := r.Header.Get(accessHeader)
+
+			if token == "" || token != accessToken {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
 func Auth(sessiongService usecases.Session) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

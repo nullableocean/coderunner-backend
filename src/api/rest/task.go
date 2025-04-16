@@ -13,12 +13,14 @@ import (
 
 type TaskHandler struct {
 	taskService    usecases.Task
+	resultService  usecases.Result
 	sessionService usecases.Session
 }
 
-func NewTaskHandler(s usecases.Task, sessions usecases.Session) *TaskHandler {
+func NewTaskHandler(s usecases.Task, resultService usecases.Result, sessions usecases.Session) *TaskHandler {
 	return &TaskHandler{
 		taskService:    s,
+		resultService:  resultService,
 		sessionService: sessions,
 	}
 }
@@ -105,10 +107,17 @@ func (h *TaskHandler) GetResult(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultRes := types.ResultResponse{Result: "wow result"}
+	resultRes := types.ResultResponse{}
 
 	status := h.taskService.CheckStatus(task)
-	if status == domain.InProgress {
+	if status == domain.Ready {
+		result, err := h.resultService.GetTaskResult(task)
+		if err != nil {
+			types.ProcessError(w, err, http.StatusInternalServerError)
+			return
+		}
+		resultRes.Result = result.Output
+	} else {
 		resultRes.Result = status.String()
 	}
 

@@ -15,12 +15,16 @@ var (
 	defaultEnvPath    = "./.env"
 )
 
+var (
+	configPath = flag.String("config", defaultConfigPath, "Path to config")
+)
+
 type AppFlags struct {
 	ConfigPath string
 }
 
 func ParseFlags() *AppFlags {
-	configPath := flag.String("config", defaultConfigPath, "Path to config")
+	flag.Parse()
 
 	return &AppFlags{
 		ConfigPath: *configPath,
@@ -31,6 +35,11 @@ type Server struct {
 	Host string `yaml:"host" env:"APP_HOST"`
 	Port string `yaml:"port" env:"APP_PORT"`
 }
+type Commiter struct {
+	AccessToken  string `env:"COMMIT_API_TOKEN"`
+	AccessHeader string `env:"COMMIT_ACCESS_HEADER"`
+}
+
 type RabbitMQ struct {
 	Host      string `yaml:"host" env:"RABBITMQ_HOST"`
 	Port      string `yaml:"port" env:"RABBITMQ_PORT"`
@@ -40,12 +49,13 @@ type RabbitMQ struct {
 }
 
 func (cfg *RabbitMQ) GetAmqpUrl() string {
-	return fmt.Sprintf("amqp://%s:%s@localhost:5672/", cfg.User, cfg.Password, cfg.Host, cfg.Port)
+	return fmt.Sprintf("amqp://%s:%s@%s:%s/", cfg.User, cfg.Password, cfg.Host, cfg.Port)
 }
 
 type AppConfig struct {
 	RabbitMQ `yaml:"rabbitmq"`
 	Server   `yaml:"server"`
+	Commiter `yaml:"commiter"`
 }
 
 func NewAppConfig(cfgPath string) *AppConfig {

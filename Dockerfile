@@ -19,4 +19,4 @@ COPY --from=builder /build/main .
 COPY .env .
 COPY ./src/config/configs .
 
-CMD ["/app/main", "--config=./configs/default.yml"]
+CMD ["/app/main", "--config=default.yml"]

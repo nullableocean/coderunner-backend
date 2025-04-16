@@ -1,16 +1,21 @@
 CERTS_DIR=./docker/certs
 COMPOSE_FILE=docker-compose.yml
 
-.PHONY: all certsgen up down clean
+.PHONY: all certsgen up down clean build
+
+build-with-certs: certsgen build
+
+build:
+	docker compose build
 
 up-all:
-	docker compose -f $(COMPOSE_FILE) up -d --build
+	docker compose -f $(COMPOSE_FILE) up -d
 
 up-docdemon:
-	docker compose -f $(COMPOSE_FILE) up docdemon -d --build
+	docker compose -f $(COMPOSE_FILE) up docdemon -d
 
 up-processor:
-	docker compose -f $(COMPOSE_FILE) up code-processor -d --build
+	docker compose -f $(COMPOSE_FILE) up code-processor -d
 
 restart-processor:
 	docker compose -f $(COMPOSE_FILE) restart code-processor -d --no-deps --build
@@ -25,4 +30,4 @@ certsgen: clean
 clean: down
 	rm -rf $(CERTS_DIR)
 
-run: gencerts up-all
+run: build-with-certs up-all

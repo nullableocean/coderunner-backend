@@ -1,4 +1,4 @@
-FROM golang:1.24.0-alpine3.20 AS builder
+FROM golang:1.24.2-alpine AS builder
 
 WORKDIR /build
 
@@ -14,6 +14,6 @@ WORKDIR /app
 
 COPY --from=builder /build/app .
 COPY .env .
-COPY docker/coderunner .
+COPY docker/coderunner ./coderunner/
 
 ENTRYPOINT ["/app/app", "--runnerdoc=/app/coderunner"]
