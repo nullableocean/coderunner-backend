@@ -31,15 +31,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	runner, err := coderunner.NewCodeRunner(docClient, flags.RunnerDockerfileDir)
+	runner, err := coderunner.NewCodeRunner(logger, docClient, flags.RunnerDockerfileDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	commiter := httpcommiter.NewHttpCommiter(cfg.Commiter.CommitUrl, cfg.Commiter.AccessToken, cfg.Commiter.AccessHeader)
-	codeProcessor := processor.NewCodeProcessor(commiter, runner)
-	processPool := processpool.NewProcessPool(cfg.Process.ProcessesLimit, codeProcessor, logger)
-	taskConsumer := consumer.NewTaskConsumer(processPool, logger)
+	commiter := httpcommiter.NewHttpCommiter(logger, cfg.Commiter.CommitUrl, cfg.Commiter.AccessToken, cfg.Commiter.AccessHeader)
+	codeProcessor := processor.NewCodeProcessor(logger, commiter, runner)
+	processPool := processpool.NewProcessPool(logger, cfg.Process.ProcessesLimit, codeProcessor)
+	taskConsumer := consumer.NewTaskConsumer(logger, processPool)
 
 	ctx := context.Background()
 	ctx, _ = signal.NotifyContext(ctx, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -58,6 +58,7 @@ func main() {
 		wg.Done()
 	}()
 
+	fmt.Println("codeprocessor service started")
 	err = taskConsumer.Consume(cfg.Rabbit.AmqpUrl, cfg.Rabbit.QueueName)
 	if err != nil {
 		log.Fatal(err)

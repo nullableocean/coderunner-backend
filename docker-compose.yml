@@ -1,13 +1,15 @@
 version: '3.8'
 services:
-  nginx:
+  proxy:
     image: nginx:latest
     depends_on:
       - app
     ports:
-      - "${APP_PORT}:80"
+      - "${PROXY_PORT}:80"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - compilesys
     
   app:
     build:
@@ -17,6 +19,8 @@ services:
       rabbitmq:
         condition: service_healthy
     restart: always
+    networks:
+      - compilesys
 
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -32,3 +36,22 @@ services:
       interval: 15s
       timeout: 15s
       retries: 10
+    networks:
+      - compilesys
+
+  tests:
+    profiles: ["tests"]
+    build:
+      context: tests
+      dockerfile: Dockerfile
+    depends_on:
+      - app
+    environment:
+      - BASE_URL=http://proxy:80
+    networks:
+      - compilesys
+
+networks:
+  compilesys:
+    name: compilesys_ext
+    driver: bridge

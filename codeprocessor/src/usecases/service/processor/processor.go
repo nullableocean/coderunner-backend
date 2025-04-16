@@ -6,6 +6,7 @@ import (
 	"codeproccesor/src/usecases/service/coderunner"
 	"context"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -16,12 +17,14 @@ const (
 type CodeProcessor struct {
 	commiter usecases.Commiter
 	runner   *coderunner.CodeRunner
+	logger   *log.Logger
 }
 
-func NewCodeProcessor(commiter usecases.Commiter, runner *coderunner.CodeRunner) usecases.Processor {
+func NewCodeProcessor(logger *log.Logger, commiter usecases.Commiter, runner *coderunner.CodeRunner) usecases.Processor {
 	return &CodeProcessor{
 		commiter: commiter,
 		runner:   runner,
+		logger:   logger,
 	}
 }
 
@@ -40,27 +43,24 @@ func (proc *CodeProcessor) Process(task domain.Task) error {
 
 	execInfo, err := proc.runner.Execute(ctx, compiler, task.Code)
 	if err != nil {
+		proc.logger.Printf("process execute error: %s\n", err)
+
 		result.Error = err.Error()
 		result.IsSuccess = false
-
-		if err := proc.saveResult(result); err != nil {
-			return err
-		}
-
-		return err
+	} else {
+		result.Output = string(execInfo.Output)
+		result.IsSuccess = execInfo.IsSuccess()
 	}
 
-	result.Output = string(execInfo.Output)
-	result.IsSuccess = execInfo.IsSuccess()
-
-	err = proc.saveResult(result)
-	if err != nil {
+	if err := proc.saveResult(result); err != nil {
 		return fmt.Errorf("save result error: %s", err)
 	}
 
-	return nil
+	return err
 }
 
 func (proc *CodeProcessor) saveResult(result domain.Result) error {
+	proc.logger.Printf("commit result. output: %.20s", result.Output)
+
 	return proc.commiter.Commit(result)
 }

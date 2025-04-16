@@ -34,6 +34,10 @@ func (s *UserService) Create(user domain.User) (*domain.User, error) {
 	user.HashedPassword = string(hashedPass)
 	user.Password = ""
 
+	_, err = s.userRepo.GetByLogin(user.Login)
+	if err == nil {
+		return nil, usecases.ErrUserExist
+	}
 	return s.userRepo.Create(&user)
 }
 

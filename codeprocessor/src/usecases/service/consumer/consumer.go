@@ -18,11 +18,12 @@ type TaskConsumer struct {
 	logger *log.Logger
 }
 
-func NewTaskConsumer(pool usecases.ProcessPool, logger *log.Logger) usecases.Consumer {
+func NewTaskConsumer(logger *log.Logger, pool usecases.ProcessPool) usecases.Consumer {
 	return &TaskConsumer{
 		pool:      pool,
 		stopCh:    make(chan struct{}),
 		isStopped: false,
+		logger:    logger,
 	}
 }
 
@@ -43,7 +44,7 @@ func (c *TaskConsumer) Consume(amqpUrl string, queueName string) error {
 	}
 	defer ch.Close()
 
-	_, err = ch.QueueDeclare(queueName, false, false, false, false, nil)
+	_, err = ch.QueueDeclare(queueName, true, false, false, false, nil)
 	if err != nil {
 		return fmt.Errorf("amqp queue declare error: %s", err)
 	}

@@ -4,26 +4,69 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"log"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 )
 
 type CodeRunner struct {
 	client *client.Client
+	logger *log.Logger
+
+	runnerDockerfilePath string
 }
 
-func NewCodeRunner(dockerClient *client.Client, runnerDockerfileCtx string) (*CodeRunner, error) {
+func NewCodeRunner(logger *log.Logger, dockerClient *client.Client, runnerDockerfilePath string) (*CodeRunner, error) {
 	runner := &CodeRunner{
-		client: dockerClient,
+		client:               dockerClient,
+		logger:               logger,
+		runnerDockerfilePath: runnerDockerfilePath,
 	}
 
-	err := runner.buildImage(runnerDockerfileCtx)
+	err := runner.init()
+
 	return runner, err
+}
+
+func (r *CodeRunner) init() error {
+	r.logger.Printf("build image...")
+
+	err := r.buildImage()
+	if err != nil {
+		return err
+	}
+
+	tries := 5
+	ctx := context.Background()
+	imageExist := false
+	for tries != 0 {
+		time.Sleep(5 * time.Second)
+
+		imageExist, err = r.imageExists(ctx)
+		if err != nil {
+			return err
+		}
+		if imageExist {
+			r.logger.Printf("runner image ready")
+			break
+		}
+
+		tries--
+	}
+
+	if !imageExist {
+		return errors.New("runner image not exist")
+	}
+
+	return nil
 }
 
 func (r *CodeRunner) Execute(ctx context.Context, compiler Compiler, code string) (*ExecInfo, error) {
@@ -145,10 +188,14 @@ func (r *CodeRunner) compileSourseFile(ctx context.Context, c *Container, compil
 }
 
 func (r *CodeRunner) runCode(ctx context.Context, c *Container, compiler Compiler) (*ExecInfo, error) {
+	r.logger.Printf("run code. compiler %s\n", compiler.String())
+
 	exInfo, err := r.execCmd(ctx, c, compiler.RunCommand())
 	if err != nil {
 		return nil, fmt.Errorf("container execute code error: %s", err)
 	}
+
+	r.logger.Printf("run code. exit code %d\n", exInfo.ExitCode)
 
 	return exInfo, nil
 }
@@ -190,24 +237,26 @@ func (r *CodeRunner) execCmd(ctx context.Context, c *Container, cmd []string) (*
 	return execInfo, nil
 }
 
-func (r *CodeRunner) buildImage(runnerDockerfileCtx string) error {
+func (r *CodeRunner) buildImage() error {
 	ctx := context.Background()
 
-	buildCtx, err := archive.TarWithOptions(runnerDockerfileCtx, &archive.TarOptions{})
+	buildCtx, err := archive.TarWithOptions(r.runnerDockerfilePath, &archive.TarOptions{})
 	if err != nil {
 		return fmt.Errorf("build context error: %s", err)
 	}
 
 	resp, err := r.client.ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
 		Tags:       []string{runnerImage},
-		Dockerfile: runnerContextDockerfile,
+		Dockerfile: "Dockerfile",
 		NoCache:    true,
 	})
 	if err != nil {
 		return fmt.Errorf("build image error: %s", err)
 	}
+
 	defer resp.Body.Close()
-	io.ReadAll(resp.Body)
+	output, _ := io.ReadAll(resp.Body)
+	r.logger.Printf("image build output: %s\n\n", output)
 
 	return nil
 }
@@ -219,4 +268,21 @@ func (r *CodeRunner) remove(ctx context.Context, c *Container) error {
 	}
 
 	return nil
+}
+
+func (r *CodeRunner) imageExists(ctx context.Context) (bool, error) {
+	images, err := r.client.ImageList(ctx, image.ListOptions{})
+	if err != nil {
+		return false, fmt.Errorf("list images error: %w", err)
+	}
+
+	for _, img := range images {
+		for _, tag := range img.RepoTags {
+			if tag == runnerImage {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
 }

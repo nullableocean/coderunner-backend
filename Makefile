@@ -1,4 +1,4 @@
-.PHONY: build build-codeprocessor build-all up up-codeprocessor up-all tests swagger down-all
+.PHONY: build build-codeprocessor build-all up up-codeprocessor up-all build-tests tests swagger down-all restart-app
 
 SRC_DIR = ./src
 SRC_MAIN_PATH = cmd/main.go
@@ -32,6 +32,13 @@ up-codeprocessor:
 up-all: up up-codeprocessor
 		@echo "Сервисы запущены"
 
+status:
+	@echo "Статус сервисов:\n"
+	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "codeprocessor|compilesys"
+
+restart-app:
+	docker compose up --build --no-deps -d app 
+
 down-all:
 		docker compose down
 		cd ${CODEPROCESSOR_DIR} && ${CODEPROCESSOR_DOWN_CMD}
@@ -40,3 +47,9 @@ swagger:
 	@echo "Генерация Swagger-документации..."
 	swag init -d $(SRC_DIR) -g $(SRC_MAIN_PATH)  -o $(DOCS_DIR)
 	@echo "Swagger-документация сгенерирована в $(DOCS_DIR)"
+
+build-tests:
+	docker compose --profile tests build tests
+
+tests:
+	docker compose --profile tests up tests

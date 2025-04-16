@@ -43,7 +43,7 @@ func main() {
 	sessionService := service.NewSessionService(sessionRepo)
 	userService := service.NewUserService(userRepo, sessionService, passHasher)
 	taskService := service.NewTaskService(taskRepo, taskSender)
-	resultService := service.NewResultService(resultRepo)
+	resultService := service.NewResultService(resultRepo, taskService)
 
 	userHandler := rest.NewUserHandler(userService)
 	taskHandler := rest.NewTaskHandler(taskService, resultService, sessionService)

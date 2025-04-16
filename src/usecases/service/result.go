@@ -8,13 +8,14 @@ import (
 )
 
 type ResultService struct {
-	taskService usecases.Task
 	repo        repository.ResultRepository
+	taskService usecases.Task
 }
 
-func NewResultService(repo repository.ResultRepository) usecases.Result {
+func NewResultService(repo repository.ResultRepository, taskService usecases.Task) usecases.Result {
 	return &ResultService{
-		repo: repo,
+		repo:        repo,
+		taskService: taskService,
 	}
 }
 

@@ -26,7 +26,6 @@ func NewCommitHandler(accessHeader, accessToken string, rs usecases.Result) *Com
 }
 
 func (h *CommitHandler) RegisterRoutes(router *chi.Mux) {
-
 	router.Group(func(r chi.Router) {
 		r.Use(middleware.CommiterAuth(h.accessHeader, h.accessToken)) //secure
 

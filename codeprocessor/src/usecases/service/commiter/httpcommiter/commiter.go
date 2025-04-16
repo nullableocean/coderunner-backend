@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -17,13 +18,16 @@ type HttpCommiter struct {
 	commitUrl    string
 	accessToken  string
 	accessHeader string
+
+	logger *log.Logger
 }
 
-func NewHttpCommiter(commitUrl string, token string, tokenHeader string) *HttpCommiter {
+func NewHttpCommiter(logger *log.Logger, commitUrl string, token string, tokenHeader string) *HttpCommiter {
 	return &HttpCommiter{
 		commitUrl:    commitUrl,
 		accessToken:  token,
 		accessHeader: tokenHeader,
+		logger:       logger,
 	}
 }
 
@@ -67,11 +71,11 @@ func (c *HttpCommiter) sendRequest(req *http.Request) error {
 		err = nil
 
 		resp, err = client.Do(req)
-		if err != nil {
-			err = fmt.Errorf("http request error: %s", err)
-		}
 
-		if resp.StatusCode == http.StatusOK {
+		if err != nil {
+			c.logger.Printf("commit error: %s\n", err)
+			err = fmt.Errorf("http request error: %s", err)
+		} else if resp.StatusCode == http.StatusOK {
 			err = nil
 			ok = true
 			break
@@ -82,7 +86,9 @@ func (c *HttpCommiter) sendRequest(req *http.Request) error {
 
 	if !ok && err == nil {
 		b, _ := io.ReadAll(resp.Body)
-		err = fmt.Errorf("commite result api error status: %s body: %s", resp.Status, b)
+		err = fmt.Errorf("commit result api error status: %s body: %s", resp.Status, b)
+	} else if err == nil {
+		c.logger.Println("commit result ready")
 	}
 
 	return err

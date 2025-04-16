@@ -63,7 +63,7 @@ func (h *TaskHandler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&types.PostTaskResponse{TaskId: task.Uuid})
 }
 

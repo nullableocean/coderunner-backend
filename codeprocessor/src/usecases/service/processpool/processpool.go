@@ -17,7 +17,7 @@ type ProcessPool struct {
 	logger *log.Logger
 }
 
-func NewProcessPool(processCount int, processor usecases.Processor, logger *log.Logger) usecases.ProcessPool {
+func NewProcessPool(logger *log.Logger, processCount int, processor usecases.Processor) usecases.ProcessPool {
 	return &ProcessPool{
 		processor: processor,
 		sem:       semaphore.NewSemaphore(processCount),

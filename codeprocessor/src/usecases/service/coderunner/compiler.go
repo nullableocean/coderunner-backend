@@ -39,11 +39,11 @@ func (c Compiler) RunCommand() []string {
 func (c Compiler) SourseFileName() string {
 	switch c {
 	case GCC, CLANG:
-		return "sourse.c"
+		return "source.c"
 	case PYTHON:
-		return "sourse.py"
+		return "source.py"
 	case NODEJS:
-		return "sourse.js"
+		return "source.js"
 	default:
 		return ""
 	}
@@ -60,7 +60,7 @@ func (c Compiler) String() string {
 	case CLANG:
 		return "clang"
 	case PYTHON:
-		return "python"
+		return "python3"
 	case NODEJS:
 		return "node"
 	default:

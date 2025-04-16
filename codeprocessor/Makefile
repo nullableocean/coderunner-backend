@@ -18,7 +18,7 @@ up-processor:
 	docker compose -f $(COMPOSE_FILE) up code-processor -d
 
 restart-processor:
-	docker compose -f $(COMPOSE_FILE) restart code-processor -d --no-deps --build
+	docker compose -f $(COMPOSE_FILE) up --build --no-deps -d codeprocessor
 
 down:
 	docker compose -f $(COMPOSE_FILE) down
