@@ -48,4 +48,4 @@ build-tests:
 	docker compose --profile tests build tests
 
 tests:
-	docker compose --profile tests up tests
+	docker compose --profile tests run --exit-code-from tests tests 

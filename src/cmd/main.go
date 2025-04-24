@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"nullableocean-postupashki/src/api/rest"
 	"nullableocean-postupashki/src/config"
 	_ "nullableocean-postupashki/src/docs"
@@ -55,6 +56,10 @@ func main() {
 	commitHandler.RegisterRoutes(router)
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
+
+	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	server := server.NewServer(cfg.Server.Port, router)
 

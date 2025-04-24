@@ -22,8 +22,10 @@ jobs:
         go-version: '1.23'
 
     - name: Env
-      run: cp .env.example .env && cp ./codeprocessor/.env.example ./codeprocessor/.env
-      
+      run: 
+        cp .env.example .env
+        cp ./codeprocessor/.env.example ./codeprocessor/.env
+
     - name: Build all
       run: make build-all
 
