@@ -1,13 +1,65 @@
 version: '3.8'
 services:
-  nginx:
+  proxy:
     image: nginx:latest
     depends_on:
       - app
     ports:
-      - "${PORT}:80"
+      - "${PROXY_PORT}:80"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - compilesys
     
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT}/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 2
+    ports:
+      - 127.0.0.1:${APP_PORT}:${APP_PORT}
+    restart: always
+    networks:
+      - compilesys
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+    restart: always
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 15s
+      timeout: 15s
+      retries: 10
+    networks:
+      - compilesys
+
+  tests:
+    profiles: ["tests"]
+    build:
+      context: tests
+      dockerfile: Dockerfile
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://app:${APP_PORT}
+    networks:
+      - compilesys
+
+networks:
+  compilesys:
+    name: compilesys_ext
+    driver: bridge

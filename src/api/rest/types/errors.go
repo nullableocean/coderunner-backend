@@ -14,7 +14,7 @@ type ErrorResponse struct {
 func ProcessError(w http.ResponseWriter, err error, defaultStatus int) {
 	status := defaultStatus
 
-	if errors.Is(err, repository.ErrTaskNotFound) {
+	if errors.Is(err, repository.ErrNotFound) {
 		status = http.StatusNotFound
 	}
 

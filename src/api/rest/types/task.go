@@ -20,7 +20,7 @@ type PostTaskResponse struct {
 
 type PostTaskRequestBody struct {
 	Code         string `json:"code"`
-	CompilerName string `json:"compiler_name"`
+	CompilerName string `json:"compiler"`
 }
 
 func ExtractPostTaskBody(r *http.Request) (*PostTaskRequestBody, error) {

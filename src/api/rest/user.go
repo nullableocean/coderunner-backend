@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"nullableocean-postupashki/src/api/rest/types"
 	"nullableocean-postupashki/src/domain"
@@ -48,11 +49,17 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.userService.Create(user)
 	if err != nil {
-		types.ProcessError(w, err, http.StatusInternalServerError)
+		code := http.StatusInternalServerError
+
+		if errors.Is(err, usecases.ErrUserExist) {
+			code = http.StatusBadRequest
+		}
+
+		types.ProcessError(w, err, code)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 }
 
 // @Summary Login Login

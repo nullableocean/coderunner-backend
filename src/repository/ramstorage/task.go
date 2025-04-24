@@ -24,6 +24,15 @@ func (rs *TaskRepository) Post(task *domain.Task) error {
 	return nil
 }
 
+func (rs *TaskRepository) Update(task *domain.Task) error {
+	if _, exist := rs.tasksMap[task.Uuid]; !exist {
+		return repository.ErrTaskNotFound
+	}
+
+	rs.tasksMap[task.Uuid] = task
+	return nil
+}
+
 func (rs *TaskRepository) GetById(id string) (*domain.Task, error) {
 	t, exist := rs.tasksMap[id]
 	if !exist {

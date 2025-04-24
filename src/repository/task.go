@@ -6,5 +6,6 @@ import (
 
 type TaskRepository interface {
 	Post(*domain.Task) error
+	Update(*domain.Task) error
 	GetById(id string) (*domain.Task, error)
 }

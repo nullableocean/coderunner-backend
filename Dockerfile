@@ -15,7 +15,10 @@ FROM alpine:3.20
 
 WORKDIR /app/
 
+RUN apk add --no-cache curl 
+
 COPY --from=builder /build/main .
 COPY .env .
+COPY ./src/config/configs .
 
-CMD ["/app/main"]
+CMD ["/app/main", "--config=default.yml"]
