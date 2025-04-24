@@ -32,10 +32,6 @@ up-codeprocessor:
 up-all: up up-codeprocessor
 		@echo "Сервисы запущены"
 
-status:
-	@echo "Статус сервисов:\n"
-	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "codeprocessor|compilesys"
-
 restart-app:
 	docker compose up --build --no-deps -d app 
 
